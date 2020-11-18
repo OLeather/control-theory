@@ -1,5 +1,6 @@
 rootProject.name = "control-theory"
 
-include("motion")
-include("models")
-include("statespace")
+include("control-core")
+include("control-motion")
+include("control-models")
+include("control-statespace")
