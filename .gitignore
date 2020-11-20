@@ -1,25 +1,3 @@
-# Java
-
-# Build
-build
-out
-
-# Gradle
 .gradle
-
-# IntelliJ
 .idea
-
-# docs
-docs
-
-cmake-build-debug
-cmake-build-release-visual-studio
-cmake-build-roborio-build
-cmake-build-windows-x64-build
-
-
-
-# MacOSX
-.DS_Store
-control-theory.iml
+build
