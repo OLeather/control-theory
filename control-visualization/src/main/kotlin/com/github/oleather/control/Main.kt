@@ -1,6 +1,7 @@
-package com.github.oleather
-
-import com.github.oleather.profiles.TrapezoidalMotionProfile
+package com.github.oleather.control
+import com.github.oleather.com.github.oleather.control.MotionConstraint
+import com.github.oleather.com.github.oleather.control.State
+import com.github.oleather.control.profiles.TrapezoidalMotionProfile
 import hep.dataforge.meta.invoke
 import kscience.plotly.Plotly
 import kscience.plotly.makeFile
