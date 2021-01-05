@@ -1,3 +1,3 @@
-package com.github.oleather.com.github.oleather.control
+package com.github.oleather.control
 
-data class State(val state: Double, val firstDerivative: Double, val secondDerivative: Double) {}
+public data class State(val state: Double, val firstDerivative: Double, val secondDerivative: Double) {}

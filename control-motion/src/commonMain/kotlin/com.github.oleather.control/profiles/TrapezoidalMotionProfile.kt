@@ -1,9 +1,9 @@
 package com.github.oleather.control.profiles
 
-import com.github.oleather.com.github.oleather.control.MotionConstraint
-import com.github.oleather.com.github.oleather.control.State
+import com.github.oleather.control.MotionConstraint
+import com.github.oleather.control.State
 
-class TrapezoidalMotionProfile(
+public class TrapezoidalMotionProfile(
     initialState: State,
     finalState: State,
     initialMotionConstraint: MotionConstraint,
@@ -23,7 +23,7 @@ class TrapezoidalMotionProfile(
     private val h = tc - xds
     private val td = 2 * vf / dm + h
 
-    override fun getStateAtTime(t: Double) = when {
+    override fun getStateAtTime(t: Double): State = when {
         t <= ta -> State(pa(t), dpa(t), ddpa())
         t <= tc -> State(pc(t), dpc(), ddpc())
         else -> State(pd(t), dpd(t), ddpd())
@@ -42,5 +42,5 @@ class TrapezoidalMotionProfile(
     private fun dpd(t: Double) = dpdb(t - h)
     private fun ddpd() = ddpdb()
 
-    fun totalTime() = td
+    public fun totalTime(): Double = td
 }
