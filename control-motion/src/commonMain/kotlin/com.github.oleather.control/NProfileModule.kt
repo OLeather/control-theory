@@ -21,8 +21,9 @@ public class NProfileModule(public val functions: MutableList<PolynomialSegment>
 
     public fun solveForX(y: Double): Double = solveForX(this, y)
 
-    public fun getDerivative(x: Double, extendRange: Boolean = false): Double? =
-        getSegment(x, extendRange)?.getDerivative(x)
+    public fun getDerivative(x: Double, extendRange: Boolean = false, n: Int = 1): Double? =
+        getSegment(x, extendRange)?.getDerivative(x, n)
+
 
     public fun getIntegral(x: Double, extendRange: Boolean = false): Double? =
         getSegment(x, extendRange)?.getIntegral(x)
@@ -44,10 +45,9 @@ public class NProfileModule(public val functions: MutableList<PolynomialSegment>
         return null
     }
 
-    public fun integrate() {
+    public fun integrate(): NProfileModule {
         for (i in functions.indices) {
             val newCoefficients = functions[i].polynomial.coefficients.toMutableList()
-//            newCoefficients[0] = 0.0
             val xShift = functions[i].xShift
             functions[i].polynomial = Polynomial(newCoefficients)
             functions[i] =
@@ -57,6 +57,7 @@ public class NProfileModule(public val functions: MutableList<PolynomialSegment>
                 functions[i].shiftY(functions[i - 1].getValue(functions[i - 1].endX))
             }
         }
+        return this
     }
 
     public fun getStartX(): Double = if (functions.size != 0) functions.first().startX else 0.0

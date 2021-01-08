@@ -6,90 +6,110 @@ import com.github.oleather.control.State
 import com.github.oleather.control.combineModules
 import kscience.kmath.functions.Polynomial
 import kotlin.math.absoluteValue
-import kotlin.math.max
 
+/**
+ * Generates a Motion Profile to the Nth degree
+ */
 public class NMotionProfile(
-    private val n: Int,
-    private val initialStates: Array<Double>,
-    private val finalStates: Array<Double>,
-    private val maxStates: Array<Double>,
-    private val minStates: Array<Double>
+    n: Int,
+    initialStates: Array<Double>,
+    finalStates: Array<Double>,
+    maxStates: Array<Double>,
+    minStates: Array<Double>
 ) : MotionProfile() {
-    public var accModule: NProfileModule = NProfileModule()
-    public var cruiseModule: NProfileModule = NProfileModule()
-    public var decModule: NProfileModule = NProfileModule()
+    public var profileModule: NProfileModule = NProfileModule()
 
     init {
-        reverseMethod()
-    }
-
-    private fun reverseMethod() {
+        var cruiseModule: NProfileModule = NProfileModule()
+        var accModule: NProfileModule = NProfileModule()
+        var decModule: NProfileModule = NProfileModule()
+        //Get index from the degree - 1
         val i = n - 1
-        //Adapt final state based on if we are in final stage or not
-        val finalState = if (i == n - 1) finalStates[i] else maxStates[i + 1]
-        //Adapt cruise acceleration based on whether the profile is negative or not
-        val cruiseAccel = if (initialStates[i] < finalState) maxStates[i] else -minStates[i]
+        val finalState = finalStates[i]
+        //Adapt cruise velocity based on whether the profile is negative or not
+        val cruiseVelocity = if (initialStates[i] < finalState) maxStates[i] else -minStates[i]
         //Create cruise module with indefinite end
         cruiseModule = NProfileModule(
             mutableListOf(
                 PolynomialSegment(
-                    Polynomial(listOf(if (i == 0) initialStates[i] else 0.0, cruiseAccel)),
+                    Polynomial(listOf(if (i == 0) initialStates[i] else 0.0, cruiseVelocity)),
                     0.0,
                     1e10
                 )
             )
         )
-
+        //If we are not on the last stage, we want to create an acceleration and deceleration profile
         if (i != 0) {
             //Prepare states arrays for acceleration profile
             val accInitialStates = initialStates.copyOf()
             val accFinalStates = finalStates.copyOf()
             val accMaxStates = maxStates.copyOf()
             val accMinStates = minStates.copyOf()
-            accFinalStates[i - 1] = cruiseAccel
-            val accProfile = NMotionProfile(i, accInitialStates, accFinalStates, accMaxStates, accMinStates)
-            accModule = combineModules(
-                accProfile.accModule,
-                accProfile.cruiseModule,
-                accProfile.decModule
-            )
+            //Remove all final states for acceleration profiles so that final states only affect the last states of the profile
+            for (i in accFinalStates.indices) {
+                accFinalStates[i] = 0.0
+            }
 
-            //Prepare states arrays for acceleration profile
+            //Set the final state of the acceleration profile to the cruise velocity. Makes the acceleration profile reach the cruise velocity.
+            accFinalStates[i - 1] = cruiseVelocity
+
+            //Create acceleration profile to the degree of i, which is n-1
+            val accProfile = NMotionProfile(i, accInitialStates, accFinalStates, accMaxStates, accMinStates)
+
+            //Populate the acceleration module with all modules of the acceleration profile
+            accModule = accProfile.profileModule
+
+            //Prepare states arrays for deceleration profile
             val decInitialStates = initialStates.copyOf()
             val decFinalStates = finalStates.copyOf()
             val decMaxStates = maxStates.copyOf()
             val decMinStates = minStates.copyOf()
-            decInitialStates[i - 1] = cruiseAccel
 
+            //Remove all initial states for the deceleration profiles so that initial states only affect the first states of the profile
+            for (i in decInitialStates.indices) {
+                decInitialStates[i] = 0.0
+            }
+
+            //Set the initial state of the deceleration profile to the cruise velocity. Makes the deceleration profile go from the cruise velocity to the final state.
+            decInitialStates[i - 1] = cruiseVelocity
+
+            //Create the deceleration profile with the degree of i, which is n-1
             val decProfile = NMotionProfile(i, decInitialStates, decFinalStates, decMaxStates, decMinStates)
-            decModule = combineModules(
-                decProfile.accModule,
-                decProfile.cruiseModule,
-                decProfile.decModule
-            )
 
+            //Populate the deceleration module with all modules of the deceleration profile
+            decModule = decProfile.profileModule
+
+            //Integrate the acceleration and deceleration modules
             accModule.integrate()
-            accModule.shiftY(initialStates[i])
             decModule.integrate()
 
+            //Shift the Y of the acceleration profile by the initial state
+            accModule.shiftY(initialStates[i])
         }
 
+        //Make the cruise module intersect the last point on the acceleration module
         cruiseModule.shiftX(accModule.getEndX(), true, true)
         cruiseModule.shiftY(accModule.getValue(accModule.getEndX()) ?: 0.0)
 
+        //Set the cruise module end x to the intersection point of the cruise line and the remaining distance (y) of the profile given the total distance, acceleration module distance, and deceleration module distance.
         cruiseModule.functions[0].endX =
             cruiseModule.solveForX(finalState.minus(decModule.getValue(decModule.getEndX()) ?: 0.0))
 
+        //Line up the deceleration module with the end of the cruise module
         decModule.shiftX(cruiseModule.getEndX(), true, true)
         decModule.shiftY(cruiseModule.getValue(cruiseModule.getEndX()) ?: 0.0)
+
+        profileModule = combineModules(accModule, cruiseModule, decModule)
     }
 
+    /**
+     * Returns the state at a given time
+     */
     override fun getStateAtTime(t: Double): State {
-        return State(0.0, 0.0, 0.0)
+        return State(profileModule.getValue(t) ?: 0.0, profileModule.getDerivative(t) ?: 0.0, 0.0)
     }
 
-    public fun totalTime(): Double = 20.0
-
+    public fun totalTime(): Double = profileModule.getEndX()
 }
 
 public fun calcIntegral(polynomial: Polynomial<Double>): Polynomial<Double> {

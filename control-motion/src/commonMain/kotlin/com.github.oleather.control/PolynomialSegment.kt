@@ -19,8 +19,14 @@ public class PolynomialSegment(
 
     public fun solveForX(y: Double): Double = solveForX(this, y)
 
-    public fun getDerivative(x: Double): Double =
-        calcDerivative(polynomial).value(RealField, x - xShift)
+    public fun getDerivative(x: Double, n: Int = 1): Double{
+        var derivative = Polynomial(polynomial.coefficients)
+        repeat(n){
+            derivative = calcDerivative(derivative)
+        }
+        return derivative.value(RealField, x - xShift)
+    }
+
 
     public fun getIntegral(x: Double): Double =
         calcIntegral(polynomial).value(RealField, x - xShift)
