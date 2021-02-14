@@ -17,12 +17,14 @@ import kscience.plotly.models.ScatterMode
 import kscience.plotly.scatter
 
 fun main(){
-    val profile1 = NMotionProfile(1, arrayOf(0.0), arrayOf(50.0), arrayOf(10.0), arrayOf(50.0))
-    val profile2 = NMotionProfile(2, arrayOf(0.0, 0.0), arrayOf(0.0, 100.0), arrayOf(50.0, 50.0), arrayOf(50.0, 50.0))
-    val profile3 = NMotionProfile(3, arrayOf(0.0, -10.0, -5.0), arrayOf(0.0, -10.0, 150.0), arrayOf(50.0, 50.0, 50.0), arrayOf(50.0, 50.0, 50.0))
-    val profile4 = NMotionProfile(4, arrayOf(0.0, 0.0, 0.0, 0.0), arrayOf(0.0, 0.0, 0.0, 400.0), arrayOf(100.0, 50.0, 50.0, 100.0), arrayOf(100.0, 50.0, 50.0, 100.0))
-    val profile5 = NMotionProfile(5, arrayOf(2.0, -5.0, 10.0, 0.0, 0.0), arrayOf(0.0, -5.0, 10.0, 0.0, 8000.0), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0))
-    val profile = profile5
+//    val profile1 = NMotionProfile(1, arrayOf(0.0), arrayOf(50.0), arrayOf(10.0), arrayOf(50.0))
+//    val profile2 = NMotionProfile(2, arrayOf(0.0, 0.0), arrayOf(0.0, 100.0), arrayOf(50.0, 60.0), arrayOf(50.0, 50.0))
+    val profile3 = NMotionProfile(3, arrayOf(0.0, 0.0, 0.0), arrayOf(0.0, 0.0, 1.0), arrayOf(100.0, 20.0, 10.0), arrayOf(100.0, 30.0, 50.0))
+//    val profile4 = NMotionProfile(4, arrayOf(0.0, 0.0, 0.0, 0.0), arrayOf(0.0, 0.0, 0.0, 400.0), arrayOf(100.0, 50.0, 50.0, 100.0), arrayOf(100.0, 50.0, 50.0, 100.0))
+//    val profile5 = NMotionProfile(5, arrayOf(2.0, -5.0, 10.0, 0.0, 0.0), arrayOf(0.0, -5.0, 10.0, 0.0, 8000.0), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0))
+//    val profile6 = NMotionProfile(6, arrayOf(2.0, -5.0, 10.0, 0.0, 0.0, 0.0), arrayOf(0.0, -5.0, 10.0, 0.0, 0.0, 2.0e5), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0, 8000.0), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0, 8000.0))
+//    val profile7 = NMotionProfile(6, arrayOf(2.0, -5.0, 10.0, 0.0, 0.0, 0.0), arrayOf(0.0, -5.0, 10.0, 0.0, 0.0, 0.0, 2.0e100), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0, 8000.0,  2.0e5), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0, 8000.0,  2.0e5))
+    val profile = profile3
 
     val module = profile.profileModule
     val dt = 0.01
@@ -32,9 +34,9 @@ fun main(){
     var v = Array(steps) { i -> module.getDerivative(i*dt, n=1) }
     var p1 = Array(steps) { i -> module.getDerivative(i*dt, n=2) }
     var v1 = Array(steps) { i -> module.getDerivative(i*dt, n=3) }
-    var p2 = Array(steps) { i -> module.getDerivative(i*dt, n=4) }
-    var v2 = Array(steps) { i -> module.getDerivative(i*dt, n=5) }
-
+    var p2 = Array(steps) { i -> 0.0 }
+    var v2 = Array(steps) { i -> 0.0 }
+    var v3 = Array(steps) { i -> 0.0 }
     var maxVal = 0.0
     for(n in v){
         if (n != null) {
@@ -43,7 +45,7 @@ fun main(){
             }
         }
     }
-    v = Array(v2.size){i -> v[i]?.times((6000/maxVal)) }
+    v = Array(v2.size){i -> v[i]?.times((maxVal/maxVal)) }
     maxVal = 0.0
     for(n in p1){
         if (n != null) {
@@ -52,7 +54,7 @@ fun main(){
             }
         }
     }
-    p1 = Array(v2.size){i -> p1[i]?.times((6000/maxVal)) }
+    p1 = Array(v2.size){i -> p1[i]?.times((maxVal/maxVal)) }
     maxVal = 0.0
     for(n in v1){
         if (n != null) {
@@ -61,7 +63,7 @@ fun main(){
             }
         }
     }
-    v1 = Array(v2.size){i -> v1[i]?.times((6000/maxVal)) }
+    v1 = Array(v2.size){i -> v1[i]?.times((maxVal/maxVal)) }
     maxVal = 0.0
     for(n in p2){
         if (n != null) {
@@ -71,7 +73,7 @@ fun main(){
         }
     }
 
-    p2 = Array(v2.size){i -> p2[i]?.times((6000/maxVal)) }
+    p2 = Array(v2.size){i -> p2[i]?.times((maxVal/maxVal)) }
     maxVal = 0.0
     for(n in v2){
         if (n != null) {
@@ -80,8 +82,18 @@ fun main(){
             }
         }
     }
+    v2 = Array(v2.size){i -> v2[i]?.times((maxVal/maxVal)) }
 
-    v2 = Array(v2.size){i -> v2[i]?.times((4000/maxVal)) }
+
+    maxVal = 0.0
+    for(n in v3){
+        if (n != null) {
+            if(n > maxVal){
+                maxVal = n
+            }
+        }
+    }
+    v3 = Array(v2.size){i -> v3[i]?.times((maxVal/maxVal)) }
 
     val plot = Plotly.plot {
         scatter {
@@ -126,8 +138,16 @@ fun main(){
             name = "Crackle"
         }
 
+
+        scatter {
+            x.set(t)
+            y.set(v3)
+            mode = ScatterMode.lines
+            name = "Pop"
+        }
+
         layout {
-            title = "5th Degree Motion Profile"
+            title = "6th Degree Motion Profile"
         }
     }
     plot.makeFile()

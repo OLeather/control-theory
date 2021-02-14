@@ -60,6 +60,18 @@ public class NProfileModule(public val functions: MutableList<PolynomialSegment>
         return this
     }
 
+    public fun differentiate(): NProfileModule {
+        for (i in functions.indices) {
+            val newCoefficients = functions[i].polynomial.coefficients.toMutableList()
+            val xShift = functions[i].xShift
+            functions[i].polynomial = Polynomial(newCoefficients)
+            functions[i] =
+                PolynomialSegment(calcDerivative(functions[i].polynomial), functions[i].startX, functions[i].endX)
+            functions[i].shiftX(xShift)
+        }
+        return this
+    }
+
     public fun getStartX(): Double = if (functions.size != 0) functions.first().startX else 0.0
     public fun getEndX(): Double = if (functions.size != 0) functions.last().endX else 0.0
 
@@ -79,6 +91,10 @@ public class NProfileModule(public val functions: MutableList<PolynomialSegment>
         for (func in functions) {
             func.setYShift(y)
         }
+    }
+
+    public fun copyOf(): NProfileModule {
+        return NProfileModule(functions.toMutableList())
     }
 }
 
