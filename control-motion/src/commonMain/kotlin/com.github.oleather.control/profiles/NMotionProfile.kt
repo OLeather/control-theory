@@ -5,9 +5,6 @@ import com.github.oleather.control.PolynomialSegment
 import com.github.oleather.control.State
 import com.github.oleather.control.combineModules
 import kscience.kmath.functions.Polynomial
-import kscience.kmath.functions.value
-import kscience.kmath.operations.Real
-import kscience.kmath.operations.RealField
 import kotlin.math.*
 
 /**
@@ -23,16 +20,109 @@ public class NMotionProfile(
     public var profileModule: NProfileModule = NProfileModule()
 
     init {
-        val firstModule = calculateProfile(n, initialStates, finalStates, maxStates, minStates).combine()
-        profileModule = firstModule
-        var finalState = firstModule.getValue(firstModule.getEndX())?:0.0
-
-        if((finalState > finalStates.last() && initialStates.last() < finalStates.last())){
-            println("overshoot positive")
-
+        var profile = calculateProfile(n, initialStates, finalStates, maxStates, minStates)
+        val finalState = profile.getValue(profile.getEndX(), true)!!
+        val i = n - 1
+        if (n > 1) {
+            if ((finalState > finalStates[i] && initialStates[i] < finalStates[i])) {
+                profile = correctProfile(profile, n, initialStates, finalStates, maxStates, minStates)
+                println("Overshoot Positive " + n)
+            }
+            if ((finalState < finalStates[i] && initialStates[i] > finalStates[i])) {
+                profile = correctProfile(profile, n, initialStates, finalStates, maxStates, minStates)
+                println("Overshoot Negative " + n)
+            }
         }
-        if((finalState < finalStates.last() && initialStates.last() > finalStates.last())){
-            println("overshoot negative")
+
+        profileModule = profile
+    }
+
+    private fun correctProfile(
+        profile: NProfileModule,
+        n: Int,
+        initialStates: Array<Double>,
+        finalStates: Array<Double>,
+        maxStates: Array<Double>,
+        minStates: Array<Double>
+    ): NProfileModule {
+        val finalState = profile.getValue(profile.getEndX(), true)!!
+        val i = n - 1
+        if ((finalState > finalStates[i] && initialStates[i] < finalStates[i])) {
+            val x = solveForX({ x ->
+                val newMaxStates = maxStates.copyOf();
+                newMaxStates[i] = x
+                println("x = " + x)
+
+                val newProfile = calculateProfile(n, initialStates, finalStates, newMaxStates, minStates)
+                return@solveForX newProfile.getValue(newProfile.getEndX(), true)!!
+            }, { x ->
+                val dx = 0.01
+
+                val newMaxStates = maxStates.copyOf()
+                newMaxStates[i] = x - (dx / 2)
+                val newProfile = calculateProfile(n, initialStates, finalStates, newMaxStates, minStates)
+
+                val newMaxStates1 = maxStates.copyOf();
+                newMaxStates1[i] = x + (dx / 2)
+                val newProfile1 = calculateProfile(n, initialStates, finalStates, newMaxStates1, minStates)
+
+                val dy = newProfile1.getValue(newProfile1.getEndX(), true)!! - newProfile.getValue(
+                    newProfile.getEndX(),
+                    true
+                )!!
+                println("dy/dx = " + dy/dx)
+                if ((dy / dx).isNaN() || (dy / dx) == 0.0) {
+                    return@solveForX 0.001
+                }
+
+                return@solveForX dy / dx
+            }, finalStates[i], maxStates[i], toleranmce = .01)
+
+
+            val newMaxStates = maxStates.copyOf();
+            newMaxStates[i] = x
+
+            return calculateProfile(n, initialStates, finalStates, newMaxStates, minStates)
+        } else if ((finalState < finalStates[i] && initialStates[i] > finalStates[i])) {
+            val x = solveForX({ x ->
+                val newMinStates = minStates.copyOf();
+                newMinStates[i] = x
+
+                println("x = " + x)
+
+                val newProfile = calculateProfile(n, initialStates, finalStates, maxStates, newMinStates)
+                return@solveForX newProfile.getValue(newProfile.getEndX(), true)!!
+            }, { x ->
+                val dx = 0.01
+
+                val newMinStates = minStates.copyOf()
+                newMinStates[i] = x - (dx / 2)
+                val newProfile = calculateProfile(n, initialStates, finalStates, maxStates, newMinStates)
+
+                val newMinStates1 = minStates.copyOf();
+                newMinStates1[i] = x + (dx / 2)
+                val newProfile1 = calculateProfile(n, initialStates, finalStates, maxStates, newMinStates1)
+
+                val dy = newProfile1.getValue(newProfile1.getEndX(), true)!! - newProfile.getValue(
+                    newProfile.getEndX(),
+                    true
+                )!!
+                println("dy/dx = " + dy/dx)
+                if ((dy / dx).isNaN() || (dy / dx) == 0.0) {
+                    return@solveForX -0.001
+                }
+
+                return@solveForX dy / dx
+            }, finalStates[i], minStates[i], toleranmce = .01)
+
+
+            val newMinStates = minStates.copyOf();
+            newMinStates[i] = x
+
+            return calculateProfile(n, initialStates, finalStates, maxStates, newMinStates)
+            return profile
+        } else {
+            return profile
         }
     }
 
@@ -86,14 +176,13 @@ public class NMotionProfile(
         return Pair(accModule, decModule)
     }
 
-
     private fun calculateProfile(
         n: Int,
         initialStates: Array<Double>,
         finalStates: Array<Double>,
         maxStates: Array<Double>,
         minStates: Array<Double>
-    ): ThreeSegmentProfile{
+    ): NProfileModule {
         var cruiseModule: NProfileModule
         var accModule = NProfileModule()
         var decModule = NProfileModule()
@@ -104,6 +193,7 @@ public class NMotionProfile(
         val finalState = finalStates[i]
         //Adapt cruise velocity based on whether the profile is negative or not
         val cruiseVelocity = if (initialStates[i] < finalState) maxStates[i] else -minStates[i]
+
         //Create cruise module with indefinite end
         cruiseModule = NProfileModule(
             mutableListOf(
@@ -135,16 +225,16 @@ public class NMotionProfile(
         cruiseModule.shiftY(accModule.getValue(accModule.getEndX()) ?: 0.0)
 
 
-        val reversed = finalState>initialStates[i]
+        val reversed = finalState > initialStates[i]
 
         //Set the cruise module end x to the intersection point of the cruise line and the remaining distance (y) of the
         //profile given the total distance, acceleration module distance, and deceleration module distance. If the
         //velocity cannot reach the max velocity given acceleration constraints, use the acceleration module's end y
         //value instead to maintain a continuous profile, but overshoot position. This overshoot will be dealt with later.
-        val cruiseEndVal = if(reversed) max(
+        val cruiseEndVal = if (reversed) max(
             finalState.minus(decModule.getValue(decModule.getEndX()) ?: 0.0),
             (accModule.getValue(accModule.getEndX()) ?: 0.0)
-        )  else min(
+        ) else min(
             finalState.minus(decModule.getValue(decModule.getEndX()) ?: 0.0),
             (accModule.getValue(accModule.getEndX()) ?: 0.0)
         )
@@ -156,9 +246,8 @@ public class NMotionProfile(
         decModule.shiftX(cruiseModule.getEndX(), true, true)
         decModule.shiftY(cruiseModule.getValue(cruiseModule.getEndX()) ?: 0.0)
 
-        return ThreeSegmentProfile(accModule, cruiseModule, decModule)
+        return combineModules(accModule, cruiseModule, decModule)
     }
-
 
     /**
      * Returns the state at a given time
@@ -167,7 +256,7 @@ public class NMotionProfile(
         return State(profileModule.getValue(t) ?: 0.0, profileModule.getDerivative(t) ?: 0.0, 0.0)
     }
 
-    public fun totalTime(): Double = 10.0
+    public fun totalTime(): Double = profileModule.getEndX()
 }
 
 public fun calcIntegral(polynomial: Polynomial<Double>): Polynomial<Double> {
@@ -198,26 +287,39 @@ public fun solveForX(piecewise: PolynomialSegment, y: Double): Double =
     solveForX(NProfileModule(arrayListOf(piecewise)), y)
 
 public fun solveForX(module: NProfileModule, y: Double): Double {
-    var x = (module.getStartX() + module.getEndX()) / 2
-    var value = module.getValue(x, true)?.minus(y)
-    var t = value?.div(module.getDerivative(x, true)!!)
-    var i = 0
-    val ITERATIONS = 50
-    while (t!!.absoluteValue >= 1.0e-10) {
-        value = module.getValue(x, true)!!.minus(y)
-        t = value / module.getDerivative(x, true)!!
 
-        x -= t
-        i++
-        if (i > ITERATIONS) return 0.0
-    }
-    return x
+    return solveForX(
+        { x: Double -> module.getValue(x, true)!! },
+        { x: Double -> module.getDerivative(x, true)!! },
+        y,
+        (module.getStartX() + module.getEndX()) / 2
+    )
 }
 
-public data class ThreeSegmentProfile(val accSegment: NProfileModule, val cruiseSegment:NProfileModule, val decSegment:NProfileModule){
-    public fun combine():NProfileModule{
-        return combineModules(accSegment, cruiseSegment, decSegment)
+public fun solveForX(
+    getValue: (x: Double) -> (Double),
+    getDerivative: (x: Double) -> (Double),
+    y: Double,
+    initialX: Double,
+    breakCondition: (x: Double) -> (Boolean) = { false },
+    toleranmce: Double = 1.0e-10
+): Double {
+    var x = initialX
+    var value = getValue(x).minus(y)
+    var t = value / getDerivative(x)
+    var i = 0
+    val ITERATIONS = 50
+    while (t.absoluteValue >= toleranmce) {
+        if (breakCondition(x)) {
+            return x
+        }
+        value = getValue(x) - y
+        t = value / getDerivative(x)
+        x -= t
+        i++
+        if (i > ITERATIONS) return x
     }
+    return x
 }
 
 

@@ -3,6 +3,7 @@ package com.github.oleather.control
 import com.github.oleather.control.profiles.NMotionProfile
 import com.github.oleather.control.profiles.TrapezoidalMotionProfile
 import com.github.oleather.control.profiles.calcIntegral
+import com.github.oleather.control.profiles.solveForX
 import hep.dataforge.meta.invoke
 import kotlinx.coroutines.flow.combine
 import kscience.kmath.functions.Polynomial
@@ -16,15 +17,15 @@ import kscience.plotly.makeFile
 import kscience.plotly.models.ScatterMode
 import kscience.plotly.scatter
 
-fun main(){
+public fun main(){
 //    val profile1 = NMotionProfile(1, arrayOf(0.0), arrayOf(50.0), arrayOf(10.0), arrayOf(50.0))
-//    val profile2 = NMotionProfile(2, arrayOf(0.0, 0.0), arrayOf(0.0, 100.0), arrayOf(50.0, 60.0), arrayOf(50.0, 50.0))
-    val profile3 = NMotionProfile(3, arrayOf(0.0, 0.0, 0.0), arrayOf(0.0, 0.0, 1.0), arrayOf(100.0, 20.0, 10.0), arrayOf(100.0, 30.0, 50.0))
-//    val profile4 = NMotionProfile(4, arrayOf(0.0, 0.0, 0.0, 0.0), arrayOf(0.0, 0.0, 0.0, 400.0), arrayOf(100.0, 50.0, 50.0, 100.0), arrayOf(100.0, 50.0, 50.0, 100.0))
-//    val profile5 = NMotionProfile(5, arrayOf(2.0, -5.0, 10.0, 0.0, 0.0), arrayOf(0.0, -5.0, 10.0, 0.0, 8000.0), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0))
+//    val profile2 = NMotionProfile(2, arrayOf(0.0, 0.0), arrayOf(0.0, 50.0), arrayOf(10.0, 60.0), arrayOf(10.0, 50.0))
+//    val profile3 = NMotionProfile(3, arrayOf(0.0, 0.0, 0.0), arrayOf(0.0, 0.0, 10.0), arrayOf(20.0, 15.0, 20.0), arrayOf(20.0, 20.0, 50.0))
+    val profile4 = NMotionProfile(4, arrayOf(0.0, 0.0, 0.0, 0.0), arrayOf(0.0, 0.0, 0.0, 50.0), arrayOf(100.0, 50.0, 50.0, 100.0), arrayOf(100.0, 50.0, 50.0, 100.0))
+//    val profile5 = NMotionProfile(5, arrayOf(0.0, 0.0, 0.0, 0.0, 0.0), arrayOf(0.0, 0.0, 0.0, 0.0, 50.0), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0))
 //    val profile6 = NMotionProfile(6, arrayOf(2.0, -5.0, 10.0, 0.0, 0.0, 0.0), arrayOf(0.0, -5.0, 10.0, 0.0, 0.0, 2.0e5), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0, 8000.0), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0, 8000.0))
 //    val profile7 = NMotionProfile(6, arrayOf(2.0, -5.0, 10.0, 0.0, 0.0, 0.0), arrayOf(0.0, -5.0, 10.0, 0.0, 0.0, 0.0, 2.0e100), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0, 8000.0,  2.0e5), arrayOf(100.0, 50.0, 50.0, 100.0, 500.0, 8000.0,  2.0e5))
-    val profile = profile3
+    val profile = profile4
 
     val module = profile.profileModule
     val dt = 0.01
