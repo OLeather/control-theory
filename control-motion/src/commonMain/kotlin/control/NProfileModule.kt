@@ -1,13 +1,9 @@
-package com.github.oleather.control
+package com.github.oleather.models
 
-import com.github.oleather.control.profiles.NMotionProfile
-import kscience.kmath.functions.OrderedPiecewisePolynomial
-import kscience.kmath.functions.value
-import kscience.kmath.operations.RealField
-import com.github.oleather.control.profiles.calcDerivative
-import com.github.oleather.control.profiles.calcIntegral
+import com.github.oleather.models.profiles.calcDerivative
+import com.github.oleather.models.profiles.calcIntegral
 import kscience.kmath.functions.Polynomial
-import com.github.oleather.control.profiles.solveForX
+import com.github.oleather.models.profiles.solveForX
 
 public class NProfileModule(public val functions: MutableList<PolynomialSegment>) {
     public constructor() : this(arrayListOf())

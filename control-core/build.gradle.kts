@@ -20,6 +20,7 @@ kotlin{
             dependencies {
                 api("kscience.kmath:kmath-core:0.2.0-dev-2")
                 api("kscience.kmath:kmath-functions:0.2.0-dev-2")
+                api("com.soywiz.korlibs.korma:korma:2.0.9")
             }
         }
     }

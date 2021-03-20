@@ -12,10 +12,6 @@ repositories {
 
 kotlin{
     explicitApiWarning()
-}
-
-kotlin{
-    explicitApiWarning()
 
     jvm()
 

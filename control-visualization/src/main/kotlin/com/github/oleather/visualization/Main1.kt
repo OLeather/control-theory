@@ -1,17 +1,7 @@
-package com.github.oleather.control
+package com.github.oleather.visualization
 
-import com.github.oleather.control.profiles.NMotionProfile
-import com.github.oleather.control.profiles.TrapezoidalMotionProfile
-import com.github.oleather.control.profiles.calcIntegral
-import com.github.oleather.control.profiles.solveForX
+import com.github.oleather.models.profiles.NMotionProfile
 import hep.dataforge.meta.invoke
-import kotlinx.coroutines.flow.combine
-import kscience.kmath.functions.Polynomial
-import kscience.kmath.functions.asFunction
-import kscience.kmath.functions.asMathFunction
-import kscience.kmath.functions.value
-import kscience.kmath.operations.RealField
-import kscience.kmath.operations.Ring
 import kscience.plotly.Plotly
 import kscience.plotly.makeFile
 import kscience.plotly.models.ScatterMode

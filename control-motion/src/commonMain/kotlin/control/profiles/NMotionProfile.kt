@@ -1,9 +1,9 @@
-package com.github.oleather.control.profiles
+package com.github.oleather.models.profiles
 
-import com.github.oleather.control.NProfileModule
-import com.github.oleather.control.PolynomialSegment
-import com.github.oleather.control.State
-import com.github.oleather.control.combineModules
+import com.github.oleather.models.NProfileModule
+import com.github.oleather.models.PolynomialSegment
+import com.github.oleather.models.State
+import com.github.oleather.models.combineModules
 import kscience.kmath.functions.Polynomial
 import kotlin.math.*
 
@@ -26,11 +26,9 @@ public class NMotionProfile(
         if (n > 1) {
             if ((finalState > finalStates[i] && initialStates[i] < finalStates[i])) {
                 profile = correctProfile(profile, n, initialStates, finalStates, maxStates, minStates)
-                println("Overshoot Positive " + n)
             }
             if ((finalState < finalStates[i] && initialStates[i] > finalStates[i])) {
                 profile = correctProfile(profile, n, initialStates, finalStates, maxStates, minStates)
-                println("Overshoot Negative " + n)
             }
         }
 
@@ -51,7 +49,6 @@ public class NMotionProfile(
             val x = solveForX({ x ->
                 val newMaxStates = maxStates.copyOf();
                 newMaxStates[i] = x
-                println("x = " + x)
 
                 val newProfile = calculateProfile(n, initialStates, finalStates, newMaxStates, minStates)
                 return@solveForX newProfile.getValue(newProfile.getEndX(), true)!!
@@ -70,7 +67,6 @@ public class NMotionProfile(
                     newProfile.getEndX(),
                     true
                 )!!
-                println("dy/dx = " + dy/dx)
                 if ((dy / dx).isNaN() || (dy / dx) == 0.0) {
                     return@solveForX 0.001
                 }
@@ -87,8 +83,6 @@ public class NMotionProfile(
             val x = solveForX({ x ->
                 val newMinStates = minStates.copyOf();
                 newMinStates[i] = x
-
-                println("x = " + x)
 
                 val newProfile = calculateProfile(n, initialStates, finalStates, maxStates, newMinStates)
                 return@solveForX newProfile.getValue(newProfile.getEndX(), true)!!
@@ -107,7 +101,6 @@ public class NMotionProfile(
                     newProfile.getEndX(),
                     true
                 )!!
-                println("dy/dx = " + dy/dx)
                 if ((dy / dx).isNaN() || (dy / dx) == 0.0) {
                     return@solveForX -0.001
                 }

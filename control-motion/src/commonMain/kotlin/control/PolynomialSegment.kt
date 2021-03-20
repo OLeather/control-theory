@@ -1,8 +1,8 @@
-package com.github.oleather.control
+package com.github.oleather.models
 
-import com.github.oleather.control.profiles.calcDerivative
-import com.github.oleather.control.profiles.calcIntegral
-import com.github.oleather.control.profiles.solveForX
+import com.github.oleather.models.profiles.calcDerivative
+import com.github.oleather.models.profiles.calcIntegral
+import com.github.oleather.models.profiles.solveForX
 import kscience.kmath.functions.Polynomial
 import kscience.kmath.functions.value
 import kscience.kmath.operations.RealField

@@ -1,6 +1,6 @@
-package com.github.oleather.control.profiles
+package com.github.oleather.models.profiles
 
-import com.github.oleather.control.State
+import com.github.oleather.models.State
 
 public abstract class MotionProfile {
     public abstract fun getStateAtTime(t: Double): State?

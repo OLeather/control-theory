@@ -15,6 +15,8 @@ repositories {
 dependencies {
     implementation("kscience.plotlykt:plotlykt-server:0.2.0")
     api(project(":control-motion"))
+    api(project(":control-core"))
+    api(project(":control-models"))
 }
 
 tasks.withType<JavaCompile> {

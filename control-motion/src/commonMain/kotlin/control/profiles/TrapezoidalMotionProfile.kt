@@ -1,7 +1,7 @@
-package com.github.oleather.control.profiles
+package com.github.oleather.models.profiles
 
-import com.github.oleather.control.MotionConstraint
-import com.github.oleather.control.State
+import com.github.oleather.models.MotionConstraint
+import com.github.oleather.models.State
 
 public class TrapezoidalMotionProfile(
     initialState: State,
