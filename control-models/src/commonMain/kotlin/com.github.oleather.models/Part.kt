@@ -8,7 +8,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-public class Part(vectorPath: VectorPath, joints: List<Joint> = emptyList()) {
+public class Part(vectorPath: VectorPath, public val joints: ArrayList<Joint> = arrayListOf()) {
 
     private val transformedVectorPath: VectorPath = vectorPath.clone()
 
@@ -37,6 +37,10 @@ public class Part(vectorPath: VectorPath, joints: List<Joint> = emptyList()) {
             transformedVectorPath.moveTo(point.x + deltaPoint.x, point.y + deltaPoint.y)
         }
         transformedVectorPath.close()
+    }
+
+    public fun addJoint(joint: Joint){
+        joints.add(joint)
     }
 
     public fun getPoints(): List<IPoint> {
