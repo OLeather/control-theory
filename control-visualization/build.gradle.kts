@@ -13,21 +13,21 @@ repositories {
 }
 
 dependencies {
-    implementation("kscience.plotlykt:plotlykt-server:0.2.0")
+    implementation("space.kscience:plotlykt-server:0.4.2")
     api(project(":control-motion"))
     api(project(":control-core"))
     api(project(":control-models"))
 }
 
 tasks.withType<JavaCompile> {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
+    sourceCompatibility = "11"
+    targetCompatibility = "11"
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }
 

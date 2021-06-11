@@ -4,7 +4,7 @@ import com.github.oleather.models.NProfileModule
 import com.github.oleather.models.PolynomialSegment
 import com.github.oleather.models.State
 import com.github.oleather.models.combineModules
-import kscience.kmath.functions.Polynomial
+import space.kscience.kmath.functions.Polynomial
 import kotlin.math.*
 
 /**

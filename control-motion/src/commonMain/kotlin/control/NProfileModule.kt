@@ -2,7 +2,7 @@ package com.github.oleather.models
 
 import com.github.oleather.models.profiles.calcDerivative
 import com.github.oleather.models.profiles.calcIntegral
-import kscience.kmath.functions.Polynomial
+import space.kscience.kmath.functions.Polynomial
 import com.github.oleather.models.profiles.solveForX
 
 public class NProfileModule(public val functions: MutableList<PolynomialSegment>) {

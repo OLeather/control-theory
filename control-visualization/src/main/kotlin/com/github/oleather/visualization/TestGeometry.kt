@@ -4,13 +4,13 @@ import com.github.oleather.core.geometry.Circle
 import com.github.oleather.core.geometry.Line
 import com.soywiz.korma.geom.Point
 import com.soywiz.korma.geom.shape.toPathList
-import hep.dataforge.meta.invoke
-import kscience.plotly.Plotly
-import kscience.plotly.makeFile
-import kscience.plotly.models.Axis
-import kscience.plotly.models.Marker
-import kscience.plotly.models.ScatterMode
-import kscience.plotly.scatter
+import space.kscience.plotly.Plotly
+import space.kscience.plotly.layout
+import space.kscience.plotly.makeFile
+import space.kscience.plotly.models.Axis
+import space.kscience.plotly.models.Marker
+import space.kscience.plotly.models.ScatterMode
+import space.kscience.plotly.scatter
 
 public fun main(){
     val circle = Circle(5.0, Point(0.0, 0.0))

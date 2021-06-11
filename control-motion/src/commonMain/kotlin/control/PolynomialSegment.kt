@@ -3,9 +3,9 @@ package com.github.oleather.models
 import com.github.oleather.models.profiles.calcDerivative
 import com.github.oleather.models.profiles.calcIntegral
 import com.github.oleather.models.profiles.solveForX
-import kscience.kmath.functions.Polynomial
-import kscience.kmath.functions.value
-import kscience.kmath.operations.RealField
+import space.kscience.kmath.functions.value
+import space.kscience.kmath.operations.RealField
+import space.kscience.kmath.functions.Polynomial
 
 public class PolynomialSegment(
     public var polynomial: Polynomial<Double>,

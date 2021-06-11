@@ -11,16 +11,11 @@ import com.soywiz.korma.geom.shape.toShape2d
 import com.soywiz.korma.geom.vector.VectorPath
 import com.soywiz.korma.geom.vector.circle
 import com.soywiz.korma.geom.vector.line
-import hep.dataforge.meta.invoke
-import hep.dataforge.values.Value
-import kscience.plotly.Plotly
-import kscience.plotly.makeFile
-import kscience.plotly.models.Axis
-import kscience.plotly.models.Marker
-import kscience.plotly.models.ScatterMode
-import kscience.plotly.models.ShapeType
-import kscience.plotly.scatter
-import kscience.plotly.shape
+import space.kscience.plotly.*
+import space.kscience.plotly.models.Axis
+import space.kscience.plotly.models.Marker
+import space.kscience.plotly.models.ScatterMode
+import space.kscience.plotly.models.ShapeType
 
 private val points: ArrayList<Point> = arrayListOf()
 

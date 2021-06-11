@@ -18,8 +18,8 @@ kotlin{
     sourceSets {
         commonMain {
             dependencies {
-                api("kscience.kmath:kmath-core:0.2.0-dev-2")
-                api("kscience.kmath:kmath-functions:0.2.0-dev-2")
+                api("space.kscience:kmath-core:0.2.1")
+                api("space.kscience:kmath-functions:0.2.1")
                 api("com.soywiz.korlibs.korma:korma:2.0.9")
                 api("com.soywiz.korlibs.korma:korma-shape:2.0.9")
             }

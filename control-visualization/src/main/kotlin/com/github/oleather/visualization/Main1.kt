@@ -1,11 +1,11 @@
 package com.github.oleather.visualization
 
 import com.github.oleather.models.profiles.NMotionProfile
-import hep.dataforge.meta.invoke
-import kscience.plotly.Plotly
-import kscience.plotly.makeFile
-import kscience.plotly.models.ScatterMode
-import kscience.plotly.scatter
+import space.kscience.plotly.Plotly
+import space.kscience.plotly.layout
+import space.kscience.plotly.makeFile
+import space.kscience.plotly.models.ScatterMode
+import space.kscience.plotly.scatter
 
 public fun main(){
 //    val profile1 = NMotionProfile(1, arrayOf(0.0), arrayOf(50.0), arrayOf(10.0), arrayOf(50.0))
